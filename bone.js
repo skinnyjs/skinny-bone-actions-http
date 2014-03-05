@@ -1,4 +1,3 @@
-var co = require('co');
 var HttpTransport = require('./httpTransport');
 
 module.exports = function attachHttpTransport(skinny, options) {
