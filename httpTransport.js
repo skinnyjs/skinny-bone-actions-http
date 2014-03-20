@@ -79,10 +79,13 @@ HttpTransport.prototype._handleRequest = function *_handleRequest(req, res) {
             }
 
             res.writeHead(res.statusCode || 200);
-        }
 
-        if (actionResponse !== undefined) {
-            res.write(JSON.stringify(actionResponse));
+            var response = { 'status': 'success' };
+            if (actionResponse !== undefined) {
+                response.data = actionResponse;
+            }
+
+            res.write(JSON.stringify(response));
         }
 
         res.end();
@@ -95,7 +98,8 @@ HttpTransport.prototype._handleRequest = function *_handleRequest(req, res) {
             e = new ServiceError(e.name + ': ' + e.message);
         }
 
-        var response = JSON.stringify({ error: e.name, errorDescription: e.message });
+        var status = e.responseCode >= 400 && e.responseCode <= 499 ? 'error' : 'fail';
+        var response = JSON.stringify({ 'status': status, 'errorCode': e.name, 'errorMessage': e.message });
 
         res.writeHead(e.responseCode, { 'Content-Type': 'application/json' });
         res.end(response);
@@ -118,11 +122,11 @@ HttpTransport.prototype._receiveBody = thunkify(function _receiveBody(req, callb
 
     var bodyString = '';
 
-    req.on('data', function(chunk) {
+    req.on('data', function (chunk) {
         bodyString += chunk;
     });
 
-    req.on('end', function() {
+    req.on('end', function () {
         callback(null, bodyString);
     });
 });
