@@ -2,6 +2,7 @@ var http = require('http');
 var url = require('url');
 var util = require('util');
 var createError = require('create-error');
+var coBody = require('co-body');
 
 var co = require('co');
 var thunkify = require('thunkify');
@@ -61,8 +62,7 @@ HttpTransport.prototype._handleRequest = function *_handleRequest(req, res) {
             throw new ActionNotPresent('Action "' + actionName + '" not present!');
         }
 
-        var body = yield this._receiveBody(req);
-        var bodyParams = body !== '' ? JSON.parse(body) : {};
+        var bodyParams = yield coBody.json(req);
         var params = util._extend(bodyParams, parsedUrl.query);
 
         // Run action
@@ -79,10 +79,13 @@ HttpTransport.prototype._handleRequest = function *_handleRequest(req, res) {
             }
 
             res.writeHead(res.statusCode || 200);
-        }
 
-        if (actionResponse !== undefined) {
-            res.write(JSON.stringify(actionResponse));
+            var response = { status: 'success' };
+            if (actionResponse !== undefined) {
+                response.data = actionResponse;
+            }
+
+            res.write(JSON.stringify(response));
         }
 
         res.end();
@@ -95,7 +98,8 @@ HttpTransport.prototype._handleRequest = function *_handleRequest(req, res) {
             e = new ServiceError(e.name + ': ' + e.message);
         }
 
-        var response = JSON.stringify({ error: e.name, errorDescription: e.message });
+        var status = e.responseCode >= 400 && e.responseCode <= 499 ? 'error' : 'fail';
+        var response = JSON.stringify({ status: status, errorCode: e.name, errorMessage: e.message });
 
         res.writeHead(e.responseCode, { 'Content-Type': 'application/json' });
         res.end(response);
@@ -112,19 +116,5 @@ HttpTransport.prototype._createServer = function _createServer() {
 
     return server;
 };
-
-HttpTransport.prototype._receiveBody = thunkify(function _receiveBody(req, callback) {
-    "use strict";
-
-    var bodyString = '';
-
-    req.on('data', function(chunk) {
-        bodyString += chunk;
-    });
-
-    req.on('end', function() {
-        callback(null, bodyString);
-    });
-});
 
 module.exports = HttpTransport;
