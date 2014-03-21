@@ -80,7 +80,7 @@ HttpTransport.prototype._handleRequest = function *_handleRequest(req, res) {
 
             res.writeHead(res.statusCode || 200);
 
-            var response = { 'status': 'success' };
+            var response = { status: 'success' };
             if (actionResponse !== undefined) {
                 response.data = actionResponse;
             }
@@ -99,7 +99,7 @@ HttpTransport.prototype._handleRequest = function *_handleRequest(req, res) {
         }
 
         var status = e.responseCode >= 400 && e.responseCode <= 499 ? 'error' : 'fail';
-        var response = JSON.stringify({ 'status': status, 'errorCode': e.name, 'errorMessage': e.message });
+        var response = JSON.stringify({ status: status, errorCode: e.name, errorMessage: e.message });
 
         res.writeHead(e.responseCode, { 'Content-Type': 'application/json' });
         res.end(response);
