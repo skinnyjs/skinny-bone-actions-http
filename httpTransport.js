@@ -62,8 +62,12 @@ HttpTransport.prototype._handleRequest = function *_handleRequest(req, res) {
             throw new ActionNotPresent('Action "' + actionName + '" not present!');
         }
 
-        var bodyParams = yield coBody.json(req);
-        var params = util._extend(bodyParams, parsedUrl.query);
+        var params = parsedUrl.query;
+
+        if (req.method == "POST") {
+            var bodyParams = yield coBody.json(req);
+            params = util._extend(bodyParams, params);
+        }
 
         // Run action
         var actionSkinny = this.skinny.newSkinny();
