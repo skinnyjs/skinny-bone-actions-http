@@ -3,6 +3,7 @@ var url = require('url');
 var util = require('util');
 var createError = require('create-error');
 var coBody = require('co-body');
+var qs = require('qs');
 
 var co = require('co');
 var thunkify = require('thunkify');
@@ -54,7 +55,7 @@ HttpTransport.prototype._handleRequest = function *_handleRequest(req, res) {
         }
 
         // Get params
-        var parsedUrl = url.parse(req.url, true);
+        var parsedUrl = url.parse(req.url);
 
         var actionName = parsedUrl.pathname.substring(1);
 
@@ -62,7 +63,7 @@ HttpTransport.prototype._handleRequest = function *_handleRequest(req, res) {
             throw new ActionNotPresent('Action "' + actionName + '" not present!');
         }
 
-        var params = parsedUrl.query;
+        var params = qs.parse(parsedUrl.query);
 
         if (req.method == "POST") {
             var bodyParams = yield coBody.json(req);
