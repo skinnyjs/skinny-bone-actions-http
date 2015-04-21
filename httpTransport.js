@@ -7,7 +7,7 @@ var qs = require('qs');
 
 var co = require('co');
 var coBody = require('co-body');
-var thenifyAll = require('thenify-all');
+var bluebird = require('bluebird');
 
 var createError = require('create-error');
 
@@ -37,11 +37,11 @@ HttpTransport.prototype.ERRORS = {
 };
 
 HttpTransport.prototype.listen = function listen() {
-    return this.server.listen(this.options.port, this.options.host);
+    return this.server.listenAsync(this.options.port, this.options.host);
 };
 
 HttpTransport.prototype.close = function close() {
-    return this.server.close();
+    return this.server.closeAsync();
 };
 
 HttpTransport.prototype._handleRequest = function _handleRequest(req, res) {
@@ -122,7 +122,7 @@ HttpTransport.prototype._handleRequest = function _handleRequest(req, res) {
 HttpTransport.prototype._createServer = function _createServer() {
     var server = http.createServer(this._handleRequest.bind(this));
 
-    var server = thenifyAll(server);
+    bluebird.promisifyAll(server);
 
     return server;
 };
