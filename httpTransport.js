@@ -36,12 +36,12 @@ HttpTransport.prototype.ERRORS = {
     ActionNotPresent:   ActionNotPresent
 };
 
-HttpTransport.prototype.listen = function *listen() {
-    yield this.server.listen(this.options.port, this.options.host);
+HttpTransport.prototype.listen = function listen() {
+    return this.server.listen(this.options.port, this.options.host);
 };
 
-HttpTransport.prototype.close = function *close() {
-    yield this.server.close();
+HttpTransport.prototype.close = function close() {
+    return this.server.close();
 };
 
 HttpTransport.prototype._handleRequest = function _handleRequest(req, res) {
@@ -112,13 +112,17 @@ HttpTransport.prototype._handleRequest = function _handleRequest(req, res) {
             res.writeHead(e.responseCode, { 'Content-Type': 'application/json' });
             res.end(response);
         }
+    }.bind(this)).catch(function(error) {
+        this.skinny.emit('error', error);
+        
+        return error;
     }.bind(this));
 };
 
 HttpTransport.prototype._createServer = function _createServer() {
     var server = http.createServer(this._handleRequest.bind(this));
 
-    thenifyAll(server, server, ['listen', 'close']);
+    var server = thenifyAll(server);
 
     return server;
 };

@@ -1,6 +1,6 @@
 {
     "name":            "skinny-bone-actions-http",
-    "version":         "0.4.1",
+    "version":         "0.4.2",
     "description":     "Http transport for skinny actions bone",
     "author":          "Geometria Lab",
     "contributors":    [
