@@ -9,6 +9,8 @@ var co = require('co');
 var coBody = require('co-body');
 var bluebird = require('bluebird');
 
+var ActionError = require('skinny-bone-actions/lib/errors/actionError');
+
 var createError = require('create-error');
 
 function HttpTransport(skinny, options) {
@@ -41,7 +43,11 @@ HttpTransport.prototype.listen = function listen() {
 };
 
 HttpTransport.prototype.close = function close() {
-    return this.server.closeAsync();
+    if (this.server.address()) {
+        return this.server.closeAsync();
+    } else {
+        return Promise.resolve();
+    }
 };
 
 HttpTransport.prototype._handleRequest = function _handleRequest(req, res) {
@@ -99,7 +105,7 @@ HttpTransport.prototype._handleRequest = function _handleRequest(req, res) {
         } catch (e) {
             this.skinny.emit('warning', e);
 
-            if (e instanceof this.skinny.actions.ERRORS.ActionsError) {
+            if (e instanceof ActionError) {
                 e = new BadRequestError(e.name + ': ' + e.message);
             } else if (!(e instanceof HttpTransportError)) {
                 e = new ServiceError(e.name + ': ' + e.message);
@@ -108,7 +114,6 @@ HttpTransport.prototype._handleRequest = function _handleRequest(req, res) {
             var status = e.responseCode >= 400 && e.responseCode <= 499 ? 'error' : 'fail';
             var response = JSON.stringify({ status: status, errorCode: e.name, errorMessage: e.message });
 
-            console.dir(this.skinny.actions.ERRORS);
             res.writeHead(e.responseCode, { 'Content-Type': 'application/json' });
             res.end(response);
         }
