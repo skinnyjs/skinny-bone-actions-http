@@ -1,6 +1,6 @@
 {
   "name": "skinny-bone-actions-http",
-  "version": "0.5.0",
+  "version": "0.7.0",
   "description": "Http transport for skinny actions bone",
   "author": {
     "name": "Geometria Lab"
@@ -16,15 +16,28 @@
     "type": "git",
     "url": "git+https://github.com/skinnyjs/skinny-bone-actions-http.git"
   },
+  "scripts": {
+    "test": "$(npm bin)/mocha --reporter spec lib/**/*.spec.js"
+  },
   "peerDependencies": {
     "skinny-bone-actions": "~0.5.0"
   },
   "dependencies": {
+    "agentkeepalive": "~2.0.2",
+    "bluebird": "~2.9.24",
     "co": "~4.5.1",
     "co-body": "~1.1.0",
-    "bluebird": "~2.9.24",
     "create-error": "~0.3.1",
+    "node-fetch": "~1.2.1",
     "qs": "~2.3.3"
+  },
+  "devDependencies": {
+    "chai": "~2.3.0",
+    "mocha": "~2.2.4",
+    "mocha-sinon": "~1.1.4",
+    "sinon": "~1.14.1",
+    "sinon-chai": "~2.7.0",
+    "skinny": "^0.4.0"
   },
   "engines": [
     "node >=0.12"

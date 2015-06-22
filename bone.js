@@ -1,15 +1,16 @@
-var HttpTransport = require('./httpTransport');
+const Server = require('./lib/server');
+const Client = require('./lib/client');
 
 module.exports = function attachHttpTransport(skinny, options) {
     "use strict";
 
-    skinny.httpTransport = new HttpTransport(skinny, options);
+    skinny.actionsHttpServer = new Server(skinny, options);
 
-    skinny.on('*initialize', function *initializeHttpTransport() {
-        yield skinny.httpTransport.listen();
+    skinny.on('*initialize', function *initializeActionsHttpServer() {
+        yield skinny.actionsHttpServer.listen();
     });
 
-    skinny.on('*shutdown', function *shutdownHttpTransport() {
-        yield skinny.httpTransport.close();
+    skinny.on('*shutdown', function *shutdownActionsHttpServer() {
+        yield skinny.actionsHttpServer.close();
     });
 };
