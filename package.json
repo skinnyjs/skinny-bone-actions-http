@@ -1,6 +1,6 @@
 {
   "name": "skinny-bone-actions-http",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "Http transport for skinny actions bone",
   "author": {
     "name": "Geometria Lab"
@@ -28,7 +28,7 @@
     "co": "~4.5.1",
     "co-body": "~1.1.0",
     "create-error": "~0.3.1",
-    "node-fetch": "~1.2.1",
+    "lodash": "~3.9.3",
     "qs": "~2.3.3"
   },
   "devDependencies": {
